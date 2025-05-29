@@ -8,7 +8,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float runningSpeed = 50f;
    
     public float verticalMovement;
-    public float horizontalMovement;
+    public float horizontalMovement; 
     public float moveAmount;
     public Vector3 moveDirection;
 

@@ -5,11 +5,17 @@ using UnityEngine;
 public class PlayerInputManager : MonoBehaviour
 {
     public static PlayerInputManager instance;
+    [Header("MOVEMENT INPUT")]
     [SerializeField] Vector2 movementInput;
     public float horizontalInput;
-    public float verticalInput;
+    public float verticalInput; 
     public float moveAmount;
- 
+    [Header("CAMERA INPUT")]
+    [SerializeField] Vector2 cameraInput;
+    public float cameraVerticalInput;
+    public float cameraHorizontalInput;
+    
+
     PlayerInput playerInput;
     private void Awake()
     {
@@ -29,6 +35,7 @@ public class PlayerInputManager : MonoBehaviour
     private void Update()
     {
         HandleMovementInput();
+        CameraMovementInput();
     }
     private void OnEnable()
     {
@@ -36,6 +43,7 @@ public class PlayerInputManager : MonoBehaviour
         {
             playerInput = new PlayerInput();            
             playerInput.PlayerMovement.Move.performed += i => movementInput = i.ReadValue<Vector2>();
+            playerInput.PlayerCamera.CameraControls.performed += i => cameraInput = i.ReadValue<Vector2>();
         }
         playerInput.Enable();
     }
@@ -54,5 +62,11 @@ public class PlayerInputManager : MonoBehaviour
         {
             moveAmount = 1f;
         }
+    }
+
+    private void CameraMovementInput() 
+    {
+        cameraVerticalInput = cameraInput.y;
+        cameraHorizontalInput = cameraInput.x;
     }
 }
