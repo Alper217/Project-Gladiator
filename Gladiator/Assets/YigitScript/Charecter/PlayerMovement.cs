@@ -4,23 +4,26 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] float walkingSpeed = 20f;
-    [SerializeField] float runningSpeed = 50f;
-   
+    [SerializeField] float walkingSpeed = 2f;
+    [SerializeField] float runningSpeed = 5f;
+    [SerializeField] float rotationSpeed = 15f;
+
     public float verticalMovement;
-    public float horizontalMovement; 
+    public float horizontalMovement;
     public float moveAmount;
-    public Vector3 moveDirection;
+    private Vector3 moveDirection;
+    private Vector3 targetRotationDirection;
 
     PlayerManager playerManager;
-    
+
     private void Awake()
     {
         playerManager = GetComponent<PlayerManager>();
-    }   
+    }
     public void HandleAllMovement()
     {
         HandleGroundedMovement();
+        RotatePlayer();
     }
     private void GetVerticalAndHorizontalInputs()
     {
@@ -34,8 +37,8 @@ public class PlayerMovement : MonoBehaviour
         moveDirection = PlayerCamera.instance.transform.forward * verticalMovement;
         moveDirection += PlayerCamera.instance.transform.right * horizontalMovement;
         moveDirection.Normalize();
-        moveDirection.y = 0f; 
-        if(PlayerInputManager.instance.moveAmount > 0.5f)
+        moveDirection.y = 0f;
+        if (PlayerInputManager.instance.moveAmount > 0.5f)
         {
             playerManager.characterController.Move(moveDirection * runningSpeed * Time.deltaTime);
         }
@@ -43,5 +46,24 @@ public class PlayerMovement : MonoBehaviour
         {
             playerManager.characterController.Move(moveDirection * walkingSpeed * Time.deltaTime);
         }
-    }   
+
+    }
+
+    private void RotatePlayer()
+    {
+        targetRotationDirection = Vector3.zero;
+        targetRotationDirection = PlayerCamera.instance.cameraObject.transform.forward * verticalMovement;
+        targetRotationDirection += PlayerCamera.instance.cameraObject.transform.right * horizontalMovement;
+        targetRotationDirection.Normalize();
+        targetRotationDirection.y = 0f;
+
+        if (targetRotationDirection == Vector3.zero)
+        {
+            targetRotationDirection = transform.forward;
+        }
+
+        Quaternion newRotation = Quaternion.LookRotation(targetRotationDirection);
+        Quaternion targetRotation = Quaternion.Slerp(transform.rotation, newRotation, rotationSpeed * Time.deltaTime);
+        transform.rotation = targetRotation;
+    }
 }
