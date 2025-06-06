@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class Inventory : MonoBehaviour
@@ -93,7 +94,82 @@ public class Inventory : MonoBehaviour
             }
         }
     }
+    // Inventory.cs'e eklenecek metodlar
+    // Bu metodlarý mevcut Inventory sýnýfýnýza ekleyin
 
+    public bool HasEmptySlot()
+    {
+        for (int i = 0; i < inventorySlots.Length; i++)
+        {
+            if (inventorySlots[i].myItem == null)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public int GetEmptySlotCount()
+    {
+        int emptySlots = 0;
+        for (int i = 0; i < inventorySlots.Length; i++)
+        {
+            if (inventorySlots[i].myItem == null)
+            {
+                emptySlots++;
+            }
+        }
+        return emptySlots;
+    }
+
+    public bool RemoveItem(Item item, int quantity = 1)
+    {
+        int removed = 0;
+        for (int i = 0; i < inventorySlots.Length && removed < quantity; i++)
+        {
+            if (inventorySlots[i].myItem != null && inventorySlots[i].myItem.myItem == item)
+            {
+                Destroy(inventorySlots[i].myItem.gameObject);
+                inventorySlots[i].myItem = null;
+                removed++;
+            }
+        }
+        return removed == quantity;
+    }
+
+    public int CountItem(Item item)
+    {
+        int count = 0;
+        for (int i = 0; i < inventorySlots.Length; i++)
+        {
+            if (inventorySlots[i].myItem != null && inventorySlots[i].myItem.myItem == item)
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    // InventorySlot.cs'e eklenecek metodlar
+    // Bu metodlarý mevcut InventorySlot sýnýfýnýza ekleyin
+
+    public void OnDrop(PointerEventData eventData)
+    {
+        // Trader slot'undan gelen drag&drop iþlemi için
+        GameObject draggedObject = eventData.pointerDrag;
+        if (draggedObject != null)
+        {
+            TraderSlot traderSlot = draggedObject.GetComponent<TraderSlot>();
+            if (traderSlot != null && Inventory.carriedItem == null)
+            {
+                // Trader'dan item satýn alma
+                return;
+            }
+        }
+    }
+
+    // IDropHandler interface'ini InventorySlot'a eklemeyi unutmayýn:
+    // public class InventorySlot : MonoBehaviour, IPointerClickHandler, IDropHandler
     Item PickRandomItem()
     {
         int random = Random.Range(0, items.Length);
